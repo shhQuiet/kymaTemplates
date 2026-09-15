@@ -1,0 +1,5 @@
+# Parent-to-child callable block test
+
+User-confirmed: the child displayed 42. Create a standalone Script named TestChild with an existing Oscillator in Inputs as an unused placeholder and paste child.st. Place TestChild in another Script named TestParent and paste parent.st. Play TestParent, not TestChild. The parent uses the verified name-printString lookup and passes a Smalltalk block as helper:. The child references ?helper and invokes value: 21. Expected diagnostic: 42, followed by intentional abort and no audio. An unbound ?helper prompt, compilation error, or value: error is a failed test to investigate, not a reason to enter a manual value. This tests block binding into nested Script source, not audio passthrough or a general import mechanism. No existing drone or library prototype is modified.
+
+Kyma required at least one child input; user added a placeholder as instructed. The child does not schedule that input. This confirms a parent-defined block passed via helper: can be called in the nested Script through ?helper. Audio passthrough and a multi-helper library remain untested.

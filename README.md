@@ -2,7 +2,11 @@
 
 Create native Kyma Sounds from descriptions using agent-authored Smalltalk and Capytalk. Reusable custom prototypes provide the building blocks; a Script constructs the graph and supplies its parameters and live controls.
 
-## Working baseline
+## Start a new sound
+
+Read [CURRENT.md](CURRENT.md) and [AGENTS.md](AGENTS.md). The finished MIDI drone establishes the current shared-parent/patch-child workflow with order-independent named template lookup. Reuse [shared support](sounds/shared-support/README.md) for new patches. The current drone source and controls are in [its README](sounds/ambient-drone/README.md).
+
+## Earlier working baseline
 
 [Full D Dorian sequence script](sounds/d-dorian-sequence/build-all-prototypes.st) is user-confirmed working with all four base prototypes: Oscillator, VCF, Level, and delay. It plays eight eighth notes, with a cutoff LFO spanning four repetitions and a tempo-synchronized feedback delay.
 
@@ -16,7 +20,7 @@ Start with the [complete setup and VCS settings](sounds/d-dorian-sequence/README
 
 ## New sound tests
 
-[Ambient drone](sounds/ambient-drone/README.md): sustained D-A-E voices with slow modulation and long echoes, using the same four prototypes. User-confirmed playback.
+[MIDI ambient drone](sounds/ambient-drone/README.md): finished three-note latch with crossfades, stereo movement, brightness random walk, and shared parent functions. Latest delivered addition is slow delay-time modulation; see the README for validation details.
 
 [Dorian bass with Euverb Stereo](sounds/dorian-bass-euverb/README.md): slowly progressing bass notes and a first test of the stereo reverb template. Awaiting playback confirmation.
 

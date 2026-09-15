@@ -1,33 +1,22 @@
-# Generic VCS startup initializer
+# VCS initialization and continuous control
 
-User confirmed "works" for ambient-drone/build-startup-test.st after supplying event: !DroneLevel and value: 0.5. This confirms the generic target binding in the drone test. The requested test included startup, live adjustment, and replay; the user gave a combined confirmation rather than separate observations.
+Both are working in the current drone. Exact library names: Initializer and InitializerGated.
 
-## Template
+| Field | Initializer | InitializerGated |
+| --- | --- | --- |
+| Class recipe | TriggeredSoundToGlobalController | Independent copy of same |
+| GeneratedEvent | ?event | ?event |
+| Value | ?value | ?value |
+| Trigger | 1 | 1 |
+| Gated | Unchecked | Checked |
+| Silent | Checked | Checked |
+| AllowLiveOverride | Checked | Checked |
+| ShowInVCS | Checked | Checked |
 
-Save TriggeredSoundToGlobalController as Initialize in the AI collection.
+Initializer is scheduled for each starting control with event: !ControlName and value: itsStartingValue. It initializes on playback and permits live changes. Multiple controls and direct physical values are user-confirmed. InitializerGated drives a continuously changing expression, currently !DroneBrightness from the child brightness walk. Put the template in the Inputs of the Script scheduling it.
 
-| Field | Setting |
-| --- | --- |
-| GeneratedEvent | ?event |
-| Value | ?value |
-| Trigger | 1 |
-| Gated | Unchecked |
-| Silent | Checked |
-| AllowLiveOverride | Checked |
-| ShowInVCS | Checked |
+## Actual range behavior
 
-The full confirmed script is [build-startup-test.st](ambient-drone/build-startup-test.st), with Inputs VCF, Oscillator, Level, delay, Initialize. It supplies event: !DroneLevel and value: 0.5. Omitting event: causes a prompt for ?event.
+Supply physical values directly in this setup: DroneDepth500, DroneDelay1.8. Earlier attempted inverse-range normalization gave DroneDepth0.16667 instead of500; do not repeat it. Relative controls use0-1. The script initializes current values, not widget range metadata or a saved default preset. Always provide ranges/units to the user when exposing controls. Behavior under different widget configurations has not been generalized.
 
-One template can be instantiated for different targets; multiple target initialization has not yet been tested. Use the confirmed single-control pattern as the next step toward complete scripted starting settings.
-
-## Range handling
-
-Sound Class Reference printed 400 documents that Value is scaled by the target VCS min/max/grid. With range 0-1 and grid 0 it passes through unchanged. Physical-unit controls require conversion based on the actual widget range; the initializer does not set widget range metadata. This sets playback values, not a saved Default preset.
-
-The standalone vcs-startup-test/ example was superseded by the user-preferred test in the existing drone.
-
-Next prepared test: ambient-drone/build-initialized.st initializes all eight controls with the same template, including three conversions for known physical widget ranges. Not yet confirmed.
-
-Initializer scaling correction: user observed DroneDepth 0.16667 when supplying 500/3000. In this actual setup, that value passes through rather than mapping to 500. Do not repeat the assumed inverse-range conversion. Current ambient-drone/build-initialized.st sends physical values directly: DroneDepth 500, DroneBrightness 180, DroneDelay 1.8. Verify displayed values after playback; actual widget metadata has not been inspected. This supersedes earlier conversion guidance for this test.
-
-Confirmed result: user reported "yep, that worked" after the direct-value revision of ambient-drone/build-initialized.st. This is now the confirmed all-control initializer baseline in the user's setup: physical values sent directly (DroneBrightness 180, DroneDepth 500, DroneDelay 1.8), relative values sent in 0-1. Do not apply the earlier inverse-range conversion here. Broader behavior under different widget configurations remains untested.
+Current source: ambient-drone/build-midi-shared-child.st. Historical startup tests retain old names and input ordering; they are evidence, not current setup instructions.

@@ -1,3 +1,5 @@
+> Historical development record. Current architecture and status: /Users/stevehorne/dev/kyma/CURRENT.md. Later findings supersede earlier hypotheses below.
+
 > Historical research; the accepted workflow is documented in [CREATING-SOUNDS.md](../CREATING-SOUNDS.md).
 
 # Named-object investigation
@@ -34,3 +36,13 @@ A documented alternative is exposing uniquely named green parameter variables in
 ## Factory Tool investigation
 
 See TOOL-OBJECT-ACCESS.md for concrete factory source calls: named top-level Sound retrieval, Sound construction, opening a Sound file window, and reading Sound points from a saved `.kym`. These are stronger evidence than reflection guesses, but do not yet establish nested-node lookup or ordinary parameter mutation. The proposed read-only gateway test is read-sound-file-tool.st; live execution remains unverified.
+
+## Direct input name probe
+
+User requested renewed property probing. inspect-input-name-direct.st displays class and printString, compares recognizes: for the successfully invoked printString and candidate name, then directly sends name without the recognition guard. This distinguishes earlier recognition-only results from actual getter behavior. name remains speculative and may raise Message not understood; no audio or mutation is scheduled. Run in a separate Script with one existing template input; capture printable description and direct name result/error. Prepared, not yet run in Kyma.
+
+Confirmed direct-name probe result: user screenshots show class Instrument, printString returns an Instrument, recognizes: #printString true, recognizes: #name false, but direct target name returns VCF. Thus (inputs at: 1) name is verified for this VCF input. recognizes: is not a reliable negative capability test for this object; empty selectors and unrecognized messages must not be treated as proof that direct calls fail. Dynamic dispatch is a possible explanation, not established. Other properties and name-based iteration/selection remain untested.
+
+Named lookup correction: candidate name asString failed on Initializer (class SoundWithVariables). Thus the earlier displayed VCF was not proof of a String return from name. The accessor yields a Sound object in this trace. New candidate uses name printString, matching the printable representation used by debugWithLabel:value:. Exact-name matching of this representation is pending playback; do not describe name as a verified string getter.
+
+Confirmed by user: build-midi-stereo-named.st works great after replacing name asString with name printString. Exact-name lookup using inputs select: [:candidate | candidate name printString = requiredName], requiring one match, is now playback-verified in the stereo MIDI drone. Use this method for new patches so input ordering is irrelevant. Required role names remain case-sensitive. Missing/duplicate diagnostic branches have not been separately tested.

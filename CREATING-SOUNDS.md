@@ -3,9 +3,9 @@
 ## Established workflow
 
 1. Prepare reusable Sounds in the AI custom-prototype collection, exposing bindable fields once.
-2. Drag the required prototypes into a Script's Inputs field in the documented order.
+2. Create a patch-specific child Script and common parent Script. Drop required prototypes into the child using the exact role names specified for the patch; order is irrelevant with the shared lookup helper. See sounds/shared-support/README.md.
 3. Paste the complete agent-authored script. Smalltalk constructs instances; Capytalk supplies live expressions.
-4. Configure VCS ranges and starting values explicitly, then compile and play in Kyma.
+4. Supply starting values through Initializer; specify VCS ranges/units for the user. Play through the parent and any existing MIDI wrapper.
 5. Save the working Sound and prototype file. Record the result and any limitations.
 
 The agent must deliver full scripts inline, not replacement sections. Expose useful fields broadly to avoid repeated human setup; supply every free variable in each call. Automatic defaults for omitted bindings are not established. Menus, checkboxes, and structural choices can use separate prototype variants.
@@ -16,13 +16,13 @@ The agent must deliver full scripts inline, not replacement sections. Expose use
 
 Variable Sounds such as source or modulator are actual input objects with names lacking a question mark. Intermediate instances omit start: and become inputs to later instances. Schedule output branches with start: 0 s; the Script mixes them.
 
-Input positions come from the Script Inputs field, not visual graph positions. Reversed positions caused earlier missing-frequency prompts. Do not diagnose that as capitalization.
+Older scripts use positions from the Script Inputs field; new scripts use exact name lookup. Reversed positions caused earlier missing-frequency prompts, not capitalization.
 
 Use search-resolved asset filenames such as 'Saw0064.aif', not absolute paths in wavetable fields. The user has current hardware; exclude legacy PitchBend bindings.
 
-## Current validation
+## Historical sequence validation
 
-[build-all-prototypes.st](sounds/d-dorian-sequence/build-all-prototypes.st) is the latest user-confirmed baseline. Oscillator, VCF, stereo Level, and the wrapped delay all work with their expanded bindings. VCS tempo, cutoff offset, resonance, LFO depth, delay beats, feedback, and level have worked in this sequence.
+[build-all-prototypes.st](sounds/d-dorian-sequence/build-all-prototypes.st) is the earlier user-confirmed sequence baseline; CURRENT.md describes the current shared-parent drone. Oscillator, VCF, stereo Level, and the wrapped delay all work with their expanded bindings. VCS tempo, cutoff offset, resonance, LFO depth, delay beats, feedback, and level have worked in this sequence.
 
 The delay was tested inside a single-input Mixer wrapper. User later resolved direct insertion by renaming the Sound Delay: Script Inputs require Smalltalk-friendly names. A wrapper is optional. Use unique names without spaces or punctuation, such as OscillatorFM and EuverbStereo; positional references do not bypass this requirement.
 
@@ -41,6 +41,6 @@ Factory examples: `Kyma Sound Library/Scripts, constructors, sequencers & compos
 
 ## Historical investigation
 
-See experiments/ for unsuccessful named-object introspection and internal Tool research. Programmatic import/export, arbitrary graph mutation, and internal class access have not been established. They are not prerequisites for the accepted template workflow.
+See experiments/ for historical reflection tests and internal Tool research. Direct name printString lookup and explicit parent-to-child callable blocks are now verified; see CURRENT.md. Programmatic import/export, arbitrary graph mutation, and internal class access have not been established. They are not prerequisites for the accepted template workflow.
 
 Native .kym files contain binary BOSS object data. Readable strings are useful evidence, not a complete editable representation. Do not fabricate or patch native graphs; let Kyma save them. Do not copy proprietary libraries or personal assets into this repository by default.

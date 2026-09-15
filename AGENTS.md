@@ -1,163 +1,70 @@
-# Project: Create native Kyma Sounds through code
+# Creating native Kyma Sounds for Steve Horne
 
-## Objective
+## Start here
 
-Create playable native Kyma Sounds for Steve Horne. The agent should design and write the sound-generating logic, signal-flow construction, parameter relationships, and live controls. This project is about making Sounds that work inside Kyma, not merely explaining synthesis or generating audio in a separate synthesizer.
+Read CURRENT.md before starting a new sound, then sounds/shared-support/README.md and sounds/TEMPLATES.md. The user has finished the drone and intends to create a different sound in a new chat. Preserve the finished drone; create a new sound folder for the next patch. This repository is /Users/stevehorne/dev/kyma; GitHub origin is https://github.com/shhQuiet/kymaTemplates.git. Do not imply local edits are pushed unless a push is actually performed.
 
-The user reports that Kyma has no public interface for creating Sounds. Our working approach is a minimal wrapper the user builds through Kyma's UI, followed by agent-authored Smalltalk in its Script field. Use Capytalk for real-time parameter behavior where appropriate. Keep the manual setup as small and reusable as possible, and put as much of each design as the proven mechanisms allow into the script.
+## Objective and workflow
 
-## Proven first test
+Turn the user's description into playable native Kyma Sounds. The user builds minimal wrappers through Kyma's UI; the agent writes Smalltalk graph construction and Capytalk live behavior. Use the existing custom prototypes and the proven common-parent/patch-child arrangement. No public graph-creation API is established or needed. A Sound template is copied into each constructed instance; shared functions do not require shared mutable references.
 
-The user successfully ran this setup in Kyma:
+- Parent Script defines reusable helper blocks and schedules the child, passing helpers as template bindings. Child Script contains patch-specific musical code and its own template Inputs. Audio passes through the parent.
+- Current generic parent example: sounds/shared-support/parent.st. Current child: sounds/ambient-drone/build-midi-shared-child.st.
+- Exactly two Scripts in the current drone: child drone -> parent KymaSystem -> existing MIDI voice/wrapper. There is NO separate brightness Script. Brightness walk belongs to the child.
+- Reuse stable helpers. Do not put patch-specific musical behavior into the generic support layer by default. For a new patch, specify the child name for clarity; the latest generic parent iterates all input Scripts without name lookup. Each receives findInput and starts at zero; outputs mix. Parent inputs must be patch Scripts accepting findInput, not raw templates. This all-input iteration revision awaits playback.
+- Kyma Script requires at least one input. The minimal block-passing test used an unused Oscillator in the child.
 
-- A Script Sound with one Oscillator in its Inputs field.
-- Oscillator Wavetable: `Sine`.
-- Oscillator Frequency: `?freq`.
-- Oscillator Envelope: `0.05`.
-- Frequency modulation off.
-- Script field:
+## User requirements
 
-```smalltalk
-(inputs at: 1) start: 0 s freq: 220 hz.
-```
+- ALWAYS give complete scripts inline when changing code. Never require merging snippets; links supplement rather than replace full copy/paste code.
+- Explicitly state which prototype to drop into WHICH Script and the exact instance name. Announce any new template requirement before relying on it. Prefer existing templates; avoid repetitive human setup and context switches.
+- Resolve inputs by exact names, not positions. User may shuffle them. Prefix identifies family/type, suffix identifies role (OscillatorModulator, InitializerGated). Never silently choose the first prefix match; variants can have different interfaces. Use unique Smalltalk-friendly names, no spaces/punctuation. Uppercase names work in this user's setup.
+- Relative VCS controls should use 0-1. Time and frequency may use natural units. State ranges, units, and scripted defaults for new controls. Initialize values in code using Initializer; do not ask the user to set starting values manually.
+- Complete useful bindable prototype fields upfront. Menus/checkboxes/structural differences can be separate variants. User has current hardware: omit legacy Oscillator PitchBend binding.
+- AI is the collection/category name, not an object-name prefix.
+- User performs minimal UI setup and playback. Do not use UI automation as the main authoring mechanism. Ask for exact errors/results when needed, not repeated broad setup checks.
+- Distinguish verified playback, documented behavior, and proposed experiments. Never claim to have heard/compiled/saved/reopened a Kyma Sound without evidence.
 
-The user reported that it works. Treat this as the established baseline; do not restart the investigation into whether Script Sounds can work. Saving and reopening the resulting `.kym` have not been confirmed.
+## Verified lookup and shared functions
 
-Referencing `(inputs at: 1)` avoids using the Sound name in source code, but does not bypass Script Inputs naming restrictions. A Sound's own name is not an Oscillator parameter named "Name"; do not repeat that confusing instruction.
+Use candidate name printString for exact role-string comparisons. Direct name returned an object printed as VCF; name asString FAILED on SoundWithVariables. recognizes: #name returned false even though direct name worked. Empty selectors and recognizes: false are not reliable evidence against dynamic access. Arbitrary other getters and graph mutation remain unverified.
 
-## Construction model
+The parent defines findInput := [:availableInputs :requiredName | ...] and passes it with child start: 0 s findInput: findInput. The child binds findInput := ?findInput, then calls findInput value: inputs value: 'Oscillator'. Explicit input-collection argument avoids capturing the parent's collection. Exact implementation in sounds/shared-support/parent.st checks one match and aborts with a diagnostic otherwise. Successful lookup/playback is verified; missing/duplicate error branches have not been separately tested.
 
-- Script Inputs are templates for constructing instances. They are not necessarily a conventional audio input chain.
-- Smalltalk in the Script field supplies start times, substitutes exposed variables, and builds combinations of template Sounds.
-- `?freq` is a parameter variable exposed by the template; `freq:` in the tested script supplies its value. This is not evidence that arbitrary parameters can be set through invented setters.
-- Capytalk expressions and `!EventValues` provide real-time controls. Keep them distinct from Smalltalk construction and `?parameterVariables`.
-- The manuals document loops, parallel scheduling, and nested template instances for building larger structures. Verify each new technique in small steps.
-- Direct class instantiation, arbitrary internal evaluation, and programmatic import/export have not been established. Investigate when useful, but do not present guessed APIs as working solutions or delay a simple Sound to develop a general framework.
+Parent-to-child block passing first returned 42 in experiments/shared-helper/. It then worked in the actual drone. This is explicit parameter passing, not automatic lexical inheritance or a general import facility.
 
-## Working style
+## Binding and scheduling rules
 
-1. Start from the proven wrapper and the user's requested sonic result. Reuse existing template inputs when possible.
-2. Consult local documentation and working examples for unfamiliar messages, Sound classes, or fields. Prefer observed syntax over assumptions from other Smalltalk implementations or audio systems.
-3. Deliver exact, paste-ready code. State every required input template, its order, and the fields the user must set. Separate UI setup from code for the Script field and code for other parameter fields.
-4. Make one small test at a time when introducing an unverified mechanism. Say what the user should hear and how to stop or change the test. Use modest output levels and account for level buildup when mixing voices.
-5. Let the user perform the minimal UI steps and report the result. If a test fails, request the exact compiler message or the specific missing field, then revise the code. Do not require elaborate screenshots or unrelated setup to diagnose a simple problem.
-6. Clearly distinguish documented behavior, untested proposed code, and user-confirmed or directly observed results. Do not claim to have compiled, heard, saved, or reopened a Sound without evidence.
-7. Persist working source, wrapper requirements, and test results in this repository so future agents can continue without repeating solved experiments.
+?freq exposes a template variable; freq: supplies its value. These are not arbitrary object setters. Supply all required fields. Binding names are local to instantiated templates; repeated variables inside one composite share a binding. !EventValues of the same name share a live controller within the relevant routing scope.
 
-Bias toward producing a usable Sound, not extended planning or infrastructure. Keep explanations practical and concise. Do not repeatedly ask permission for routine research, source edits, or preparation already within the user's request.
+Variable Sounds source/modulator are actual named input objects. Construct intermediate instances without start:, then schedule final output branches with start: 0 s. Scheduled branches mix. Wavetables use search-resolved names such as 'Saw0064.aif', not absolute paths.
 
-## Local resources and ownership
+Parenthesize successive keyword messages: (x vmax: low) vmin: high. Unparenthesized vmax: low vmin: high caused a confirmed nonexistent vmax:vmin: error. Other Smalltalk APIs must be checked against local documentation/examples before assuming them.
 
-- `/Users/stevehorne/dev/kyma`: this development repository; keep authored source and project notes here.
-- `/Volumes/Kyma/Kyma 7 Folder/Documentation`: installed manuals.
-- `/Volumes/Kyma/Kyma 7 Folder/Kyma Sound Library`: extensive factory/example Sounds, including scripting examples.
-- `/Volumes/Kyma/SH-Kyma`: Steve's personal Sounds, classes, samples, and analyses.
-- `/Volumes/Kyma/kyma-kata`: contributed code from the Kyma Kata user community, not Steve's original code. Consult its README and preserve attribution when adapting contributions.
+## Templates and control initialization
 
-Useful installed example collection:
+See sounds/TEMPLATES.md and individual prototype recipes for full interfaces. Initializer is the verified TriggeredSoundToGlobalController recipe with ?event, ?value, Trigger 1, Gated off, Silent/AllowLiveOverride/ShowInVCS on. InitializerGated is the independent Gated-on copy used successfully for the continuous brightness walk. Put it in the Script that schedules it, currently the child. Leaving it in the parent caused the user's restored-brightness setup problem.
 
-`/Volumes/Kyma/Kyma 7 Folder/Kyma Sound Library/Scripts, constructors, sequencers & composition/Scripts*.kym`
+Initializer start: 0 s event: !DroneDepth value: 500 sets 500 in the user's setup. DO NOT divide physical values by widget ranges; an earlier 500/3000 produced 0.16667 and was wrong. Multiple initialization targets and direct physical values are user-confirmed. Widget range metadata is not automatically configured by this mechanism. Details: sounds/vcs-initialization.md.
 
-The asterisk is a literal character in the filename; quote the path when accessing it. Readable strings in this collection include the tutorial's template-based construction syntax.
+## Current evidence and limitations
 
-Use personal and community files as references. Save experiments as new files; do not overwrite existing Sounds or copy entire asset libraries into the repository by default.
+- Four base prototypes and D Dorian sequencer verified: sounds/d-dorian-sequence/build-all-prototypes.st (historical positional inputs).
+- Named stereo MIDI drone verified: sounds/ambient-drone/build-midi-stereo-named.st.
+- Shared-parent drone and restored child brightness walk verified after placing InitializerGated in the child.
+- Latest shared child adds a requested 30-second +/-0.02-second delay LFO. The original +/-0.1-second sweep was audible but too dramatic; reduced depth awaits explicit playback confirmation. Preserve it as latest delivered source and label accurately.
+- EuverbStereo prepared; playback not explicitly confirmed. OscillatorFM and optional delay variants are inventory-confirmed, not separately playback-verified.
+- Current MIDI keyboard: channel 1, MPE DISABLED. Generic MPE prevented response even though note messages arrived in monitor. Existing MIDIVoice Live MIDI, channel1, polyphony1 wraps whole three-slot drone. Polyphony3 would duplicate the entire script. No need to repeat this troubleshooting for a new patch unless symptoms justify it.
+- Historical tests and chronological notes may describe superseded names, ordering, or architecture. CURRENT.md and these instructions govern new work.
 
-## Documentation map
+## Files and local references
 
-- `Kyma X Revealed.pdf`, printed pages 283-290: constructing Sounds algorithmically with Script, template variables, chains, mixing, debugging, and expansion. The older book also contains substantial Smalltalk and Capytalk tutorials.
-- `Sound Class Reference.pdf`, printed pages 308-309 (PDF pages 309-310): Script class. Printed pages 255-256: Oscillator.
-- `Capytalk Reference.pdf`: control messages, ranges, and examples.
-- `Kyma_7_Revealed.pdf`: Kyma 7 UI behavior, parameters, Multigrid, and OSC. This February 2015 edition contains unfinished sections; use the other manuals to fill gaps while checking version-specific UI behavior.
-- `TAU ReadMe.pdf` and `Batch Analysis Tool.pdf`: analysis, morphing, and resynthesis workflows when relevant.
+- /Volumes/Kyma/SH-Kyma/Classes/Custom Collections.kym: user's custom prototypes, AI collection alongside SH Spectral/SH Utility. Open as regular Sound file to edit/Action > Collect; Custom Prototypes to show prototype bar.
+- /Volumes/Kyma/Kyma 7 Folder/Documentation: installed manuals. Kyma X Revealed 283-290 Script construction; Sound Class Reference Script308-309, DelayWithFeedback49-50, Level120, Oscillator255-256, VCF414, TriggeredSoundToGlobalController400. Capytalk Reference for live expressions.
+- /Volumes/Kyma/Kyma 7 Folder/Kyma Sound Library: factory examples. Scripts, constructors, sequencers & composition/Scripts*.kym has a literal asterisk; quote paths.
+- /Volumes/Kyma/SH-Kyma: Steve's personal assets. /Volumes/Kyma/kyma-kata: community contributions; preserve attribution and consult its README.
+- /private/tmp/kyma-doc-review may contain extracted manual text; recreate if missing.
 
-OSC is a documented control mechanism, but it is not an established Sound-creation interface. Do not substitute external control for the objective of constructing native Sounds.
+Native .kym files are binary BOSS objects. Readable strings are useful references, not a safe editable representation. Do not fabricate or patch native graphs or copy whole proprietary/personal asset libraries. User saves native Sounds through Kyma. Store authored .st and setup/evidence in this repo. Native file location/save-reopen for the finished drone is not recorded. Do not invent it.
 
-## Files and validation
-
-Sampled `.kym` files contain binary object data beginning with `BOSS 980001`. Readable strings can reveal examples but are not a complete, editable representation. Do not blindly patch or fabricate native binary files. Let Kyma create and save native files unless a reliable alternative is demonstrated.
-
-Keep scripts as readable text with their exact wrapper setup. A script alone is not a self-contained `.kym`. Record dependencies on templates, custom classes, wavetables, samples, and analysis files. Use Kyma's File Archivist when a portable native package is needed.
-
-The definitive test is compilation and playback in Kyma. Saving and reopening is a separate validation step when delivering a reusable native Sound. Static inspection or successful code generation alone does not establish that a Sound works.
-
-## Accepted approach after integration investigation
-
-The user explicitly accepted constructing graphs from prepared templates and recreating them from edited scripts. Arbitrary named-node mutation is no longer a prerequisite: the script is the source of the generated graph. Focus on proving composition and then extending the reusable construction kit. User performs the minimal wrapper setup; avoid making UI automation the primary authoring mechanism.
-
-The oscillator-filter experiment is historical. Current work uses the verified four-prototype baseline described below.
-
-## Script input order
-
-`inputs at: n` refers to the order in the Script Sound's Inputs field. Always state the required order alongside positional scripts, and check the actual field when diagnosing unexpected variable prompts. Do not infer order from creation order or the visual signal-flow layout.
-
-In the oscillator-filter experiment, the user's actual order was Filter first, Oscillator second. Correct code instantiates `(inputs at: 2)` as the oscillator and schedules `(inputs at: 1)` as the filter. The reversed references caused an unbound frequency prompt and reuse of the value entered through that dialog. The user acknowledged the ordering dependency after the correction. Do not repeat the earlier unsupported capitalization diagnosis.
-
-Prefer assigning descriptive local variables at the start of multi-template scripts (for example, `filterTemplate := inputs at: 1. oscillatorTemplate := inputs at: 2.`) so positional assumptions are centralized and the rest of the graph-building code is readable. These local names do not perform lookup by Sound display name.
-
-## Confirmed musical example
-
-`sounds/d-dorian-sequence/build-four-loop-lfo.st` was played successfully by the user, who reported "very nice, plays well." It constructs Oscillator -> VCF -> Level from three templates ordered VCF, Oscillator, Level. The oscillator exposes `?wave` and receives the search-resolved filename `'Saw0064.aif'`. Capytalk supplies the eight-note D Dorian sequence, per-note filter and amplitude contours, and a raised-cosine cutoff LFO over four sequence repetitions (9.6 seconds at 100 BPM). Reuse this as a working construction example. Native saving/reopening and live tempo-change phase behavior have not been verified.
-
-## VCS control setup requirements
-
-Whenever exposing controls in the VCS, explicitly provide each control's numeric range, units, and starting value alongside the script. Do not assume Kyma infers useful widget ranges. Explain any required range adjustment as part of setup, not only after troubleshooting. Distinguish numeric Hz values from normalized 0-1 controls and state whether initial values must be set in the VCS or are supplied by code.
-
-The user confirmed the D Dorian build-vcs.st variant works after using appropriate ranges for CutoffOffset and LFODepth. Their apparent lack of effect was resolved by using values in the thousands rather than a tiny Hz range. Reference settings: BPM 40-200, start 100; CutoffOffset -150 to 3000 Hz, start 0; Resonance 0-0.9, start 0.55; LFODepth 0-4000 Hz, start 1400. The user reported "all is good" and specifically requested that ranges accompany future VCS controls.
-
-## Custom prototype collection
-
-The user clarified that the desired delivery is a custom prototype collection. Prepared Sounds are sufficient; encapsulated classes are optional. Use the AI SoundCollection in `/Volumes/Kyma/SH-Kyma/Classes/Custom Collections.kym`, which also contains SH Spectral and SH Utility. Open as a regular Sound file to edit/collect Sounds and as Custom Prototypes to expose categories in the prototype bar. No encapsulated classes have been created for this project.
-
-Kyma X Revealed printed 294-302 documents optional New Class from example. If using classes later, distinguish class fields from free variables bound by Script; arbitrary field setters remain unproven.
-
-The wrapped delay with VCS DelayBeats is user-confirmed. User subsequently established that direct insertion failed because of the Sound name: renaming it Delay allowed the drop. A Mixer wrapper is optional, not required for direct insertion. Existing working wrappers can remain.
-
-## One-time prototype parameter coverage
-
-User explicitly prioritizes completing repetitive prototype setup once to avoid future human context switches. Expose all useful bindable fields upfront, supply complete parameter values in agent-authored scripts, and use separate variants for fixed menus/checkboxes or structural choices. Do not defer ordinary fields such as Oscillator Formant merely for simplicity. Custom prototype collection can contain prepared Sounds; encapsulated custom classes are optional. Oscillator setup is in sounds/oscillator-prototypes.md; base prototype playback is confirmed.
-
-Prototype naming and hardware: user has current Kyma hardware and explicitly requests excluding legacy parameters. Do not expose Oscillator PitchBend or supply pitchBend: in new template calls. Use Script-compatible names such as Oscillator and OscillatorFM; AI belongs only in the collection name, not each object name.
-
-User confirmed the expanded Oscillator prototype plays correctly in the existing sequencer. build-vcs-delay.st now includes that full oscillator call. Fully parameterized VCF setup is sounds/vcf-prototype.md; playback is confirmed.
-
-## Deliver complete scripts
-
-User explicitly requires the full copy-and-paste script whenever making script changes. Do not give replacement sections or require manual merging. Include the complete script inline in the response; a saved-file link may supplement but must not replace it. Partial edits waste user time and introduce errors.
-
-User confirmed build-vcs-delay-prototypes.st works with both the expanded Oscillator and VCF prototypes. This is an intermediate confirmed script, superseded by build-all-prototypes.st. VCF prototype binding at zero modulation range is confirmed; nonzero audio-rate modulation is not yet tested.
-
-Level prototype with separate ?left and ?right was user-confirmed working; build-vcs-delay-prototypes.st now reflects that successful script. Full numeric Delay prototype setup is sounds/delay-prototype.md; sounds/d-dorian-sequence/build-all-prototypes.st is user-confirmed working.
-
-Latest confirmed baseline: sounds/d-dorian-sequence/build-all-prototypes.st. User reported "works good" after testing the fully parameterized base delay wrapper. Oscillator, VCF, stereo Level, and base delay are all confirmed in this script, ordered VCF, Oscillator, Level, delay. Oscillator FM and optional fixed-setting variants remain unverified. Use this full script as the starting point for future sound revisions.
-
-Ambient drone: sounds/ambient-drone/build.st is user-confirmed ("very nice"). It reuses the same four base prototypes for three sustained D-A-E voices with distinct slow modulation, stereo balance, and delay times. This validates the three-iteration construction loop in this sound. Drone-prefixed controls are independent of the sequencer. Native save/reopen and individual control tests are not separately confirmed.
-
-## Default VCS ranges: normalized controls
-
-User requests 0-1 VCS controls wherever possible to avoid manual range editing. Map normalized values to physical quantities inside the script, clamp controls before scaling, and give normalized starting values. Use 0-1 for relative controls. User explicitly allows natural units for time and frequency (and similar meaningful physical quantities); retain Hz/seconds where appropriate. DroneMotion remains a normalized relative slowness macro, while DroneBrightness/DroneDepth remain Hz and DroneDelay remains seconds. For existing Sounds, saved widget ranges and preset values may require a one-time migration; script arithmetic does not reset VCS metadata. A deliberate exception, such as previously requested literal !BPM, should follow user intent rather than silently changing its meaning. Current ambient-drone/build.st is normalized and awaiting playback; original confirmed source is build-physical-controls.st. Always provide the full updated script inline.
-
-EUVerb prototype preparation is documented in sounds/euverb-prototype.md (Sound Class Reference 64-66). Not yet playback-tested. Its cutoff fields and decay are normalized controls, not literal Hz/seconds. Freeze is documented as a button; parameter binding remains unestablished.
-
-EUVerb correction: user selected the composite Euverb Stereo, whose EuverbLeft and EuverbRight fields differ from the generic EUVerb class. Screenshot-confirmed recipe is sounds/euverb-prototype.md: left has decay/cutoff/reverb; right also has diffusion. Outer Variable source, dry Level both channels ?direct; preserve channel routing. Generic EUVerb ranges must not be assumed for this composite. Not yet playback-tested.
-
-Generic VCS initialization is now user-confirmed: sounds/ambient-drone/build-startup-test.st uses Initialize (TriggeredSoundToGlobalController) at input 5, GeneratedEvent ?event, Value ?value, Trigger 1, Gated off, Silent/AllowLiveOverride/ShowInVCS on. Script supplies event: !DroneLevel and value: 0.5. User reported "works" for the requested startup/live-adjustment/replay test. Use this mechanism for scripted starting settings; multi-target and physical-range initialization are not yet tested. Value follows target VCS range scaling; see sounds/vcs-initialization.md.
-
-Initializer scaling correction: user observed DroneDepth 0.16667 when supplying 500/3000. In this actual setup, that value passes through rather than mapping to 500. Do not repeat the assumed inverse-range conversion. Current ambient-drone/build-initialized.st sends physical values directly: DroneDepth 500, DroneBrightness 180, DroneDelay 1.8. Verify displayed values after playback; actual widget metadata has not been inspected. This supersedes earlier conversion guidance for this test.
-
-Confirmed result: user reported "yep, that worked" after the direct-value revision of ambient-drone/build-initialized.st. This is now the confirmed all-control initializer baseline in the user's setup: physical values sent directly (DroneBrightness 180, DroneDepth 500, DroneDelay 1.8), relative values sent in 0-1. Do not apply the earlier inverse-range conversion here. Broader behavior under different widget configurations remains untested.
-
-MIDI setup diagnosis confirmed: ordinary keyboard note events arrived on channel 1 in the monitor, but neither factory keyboard Sounds nor the direct !KeyNumber oscillator test responded while MIDI Configuration was Manual / Generic MPE. User confirmed disabling MPE fixed the issue. For this conventional channel-1 keyboard use MPE disabled; do not infer working Sound note routing merely from monitor traffic. The three-note MIDI latch still needs a separate post-fix playback confirmation.
-
-## Script Inputs require compatible Sound names
-
-User confirmed that Script input objects must have Smalltalk-friendly names. Renaming the delay to Delay fixed its rejected drop. Use unique simple names with no spaces or punctuation, e.g. VCF, Oscillator, OscillatorFM, Level, Delay, EuverbStereo, Initialize. User verified uppercase Delay works; do not impose a lowercase-only rule from older manuals. Positional inputs at: references do not bypass editor naming restrictions. Check name first when a Sound cannot be dropped/pasted into Script Inputs, before inventing class restrictions or adding wrappers. This corrects earlier advice recommending names containing spaces.
-
-Current input-order preference: Initialize must be first. For the MIDI crossfade drone with output toggle, use Initialize, VCF, Oscillator, Level, Delay (indices 1-5). sounds/ambient-drone/build-midi-crossfade-toggle.st has been updated accordingly. Apply initializer-first ordering to future scripts. Historical scripts retain their documented earlier order; do not confuse them with the current script.
-
-Nested Script test prepared: sounds/brightness-walk-wrapper/ wraps the existing drone unchanged with Initialize, Drone, Control inputs. Control is a generic SoundToGlobalController writing !DroneBrightness continuously. Low/high controls govern base brightness, not added DroneDepth modulation. Documented but not yet playback-verified.
-
-Explicitly announce any new template requirement before using it in code, and prefer a suitable independent copy of existing templates. Brightness-walk wrapper Control now uses a copy of Initialize with Gated checked (Trigger 1). In Smalltalk, parenthesize successive keyword operations: (x vmax: low) vmin: high; x vmax: low vmin: high sends nonexistent vmax:vmin: and caused a confirmed compilation error.
-
-Authoritative current user template names are in sounds/TEMPLATES.md, transcribed from screenshot. Use Initializer (not Initialize), DelayWithFeedback (not Delay), and EuverbStereo. Only one controller template exists: Initializer. Do not assume a Control template was created. Previous recipe used TriggeredSoundToGlobalController; latest inventory screenshot does not independently show exact class or Gated setting. Explain any need for an independent gated copy before code relies on it.
-
-Architecture clarification from user: the inner drone Script and outer brightness-control Script are patch-specific compositions, not reusable library building blocks. Reusable objects are the prepared templates (Oscillator, VCF, Level, delay variants, EuverbStereo, Initializer, and proposed GatedInitializer). Nested Scripts organize a particular patch; do not promote their implementation to a reusable template unless requested. GatedInitializer is user-proposed, not yet confirmed created.
+User-approved standard parent behavior: treat every parent input as a child patch Script, pass the common helper bindings to each, schedule all at start: 0 s, and mix their audio outputs. No hard-coded child name or special single-child path. Keep raw prototypes inside the children. This is the intended architecture; the latest all-child iteration implementation is still awaiting explicit playback confirmation.

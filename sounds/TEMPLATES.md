@@ -14,9 +14,18 @@ Confirmed by user screenshot, in display order:
 - DelayKeepMemory
 - EuverbStereo
 - Initializer
+- InitializerGated
 
-Initializer is the only controller template the user has created. Earlier instructions used Initialize and proposed Control; neither is a separate confirmed library template. Previous verified recipe for Initializer used TriggeredSoundToGlobalController with GeneratedEvent ?event, Value ?value, Trigger 1, Gated off, Silent/AllowLiveOverride/ShowInVCS on. User calls it SoundToGlobalController generically; this screenshot alone does not establish its exact class or current Gated setting.
+The current screenshot confirms both Initializer and InitializerGated exist. User names variants with the original type/name first, followed by the variant suffix: InitializerGated, not GatedInitializer. Follow this convention for future variants.
 
-For the random-walk wrapper, continuous output needs an independently configured copy (Gated on for the triggered class), or a future generalization of the template. Do not assume a Control template exists. Announce any copy or parameter changes explicitly before supplying code that depends on them. Preserve the original startup initializer behavior. Current local object class and parameters must be checked before treating the inventory screenshot as confirmation of them.
+Initializer is the one-shot startup controller; InitializerGated is its independent gated copy for continuous control. Both are working in the current drone. See vcs-initialization.md for settings and actual value scaling.
 
-Use the exact names above in setup instructions. Script positional references remain valid after display renames when input order is preserved. Initializer goes first. Current inner drone order: Initializer, VCF, Oscillator, Level, DelayWithFeedback. Historical scripts and notes use earlier display names.
+## Exact names and roles
+
+For each patch specify the prototype and exact instance name. Names begin with family/type and optionally add a role suffix, e.g. OscillatorModulator. Prefix alone is not sufficient to distinguish OscillatorFM from Oscillator or InitializerGated from Initializer. Never silently choose the first prefix match.
+
+Resolve names with the verified shared findInput helper using candidate name printString. Inputs may be in any order. Missing or duplicate exact role names should report a clear diagnostic. Historical positional scripts still require their own documented order.
+
+Current drone child Inputs: Initializer, InitializerGated, Oscillator, VCF, Level, DelayWithFeedback. Parent KymaSystem has only child drone. No separate brightness Script.
+
+Inventory confirms existence of optional variants; it does not establish playback of every variant. Oscillator, VCF, Level, DelayWithFeedback, Initializer, and InitializerGated are working in the drone. OscillatorFM, optional delay variants, and EuverbStereo are not separately playback-confirmed.

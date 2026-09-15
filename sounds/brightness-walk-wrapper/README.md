@@ -1,3 +1,5 @@
+> Historical development record. Current architecture and status: /Users/stevehorne/dev/kyma/CURRENT.md. Later findings supersede earlier hypotheses below.
+
 # Patch-specific outer Script: brightness random walk
 
 Status: prepared from documented Script nesting and SoundToGlobalController; not yet playback-tested. Keep the existing drone Script unchanged. Use it as input to a new outer Script.
@@ -18,4 +20,8 @@ Current Control template: user chose an independent copy of Initialize (Triggere
 
 Compilation correction: unparenthesized vmax: low vmin: high was parsed as nonexistent vmax:vmin:. build.st now computes brightness separately and uses (brightness vmax: low) vmin: high. User error was in this outer script, not evidence against Script nesting. Awaiting corrected playback.
 
-Architecture: this outer Script is a patch-specific controller, just like the inner drone Script. It is not intended as a reusable prototype. The reusable continuous-control building block is GatedInitializer (an independent copy of Initializer with Gated checked), which the user offered to create; creation is not yet confirmed.
+Architecture: this outer Script is a patch-specific controller, just like the inner drone Script. It is not intended as a reusable prototype. The reusable continuous-control building block is InitializerGated (an independent copy of Initializer with Gated checked), whose creation and name are now confirmed by the user’s collection screenshot; internal settings and playback are not established by that screenshot.
+
+## Shared-parent integration correction
+
+User reports brightness walk lost after shared-parent insertion; cause not yet established. build-shared-system.st restores explicit outer scheduling and resolves inputs by exact names Initializer, KymaSystem, InitializerGated (any order). KymaSystem contains drone and passes findInput; drone keeps five templates. Chain drone -> KymaSystem -> brightness Script -> existing MIDI voice. The outer wrapper locally defines lookup because it is outside the shared parent scope. This minimal integration fix preserves the existing topology; do not claim the loss was definitively due to ordering. Awaiting playback.

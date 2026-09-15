@@ -1,3 +1,5 @@
+> Historical development record. Current architecture and status: /Users/stevehorne/dev/kyma/CURRENT.md. Later findings supersede earlier hypotheses below.
+
 # MIDI-latched ambient drone
 
 Status: prepared, awaiting user MIDI/playback test. Full script: build-midi-latch.st. Same Inputs: VCF, Oscillator, Level, delay, Initialize. No new prototype fields or VCS controls. All eight starting controls use the verified direct-value initializer.
@@ -43,3 +45,23 @@ New candidate build-midi-crossfade-clear.st uses Initialize first, then VCF, Osc
 Final dry and delay outputs are also gated by noteCount>0, keeping retained delay memory inaudible after clear until a fresh note is played. This clears active note assignments, not physical delay buffers; residual effects memory could briefly be heard when new input reopens the output. Reversing the fade before reaching silence retains the existing chord. No new VCS settings; existing DroneOn initialized to 1.
 
 Documented reset method: Capytalk Reference countTriggersReset: (printed 68) resets to zero on positive reset transition; switchedOn (279) detects fresh note-on edges. This reset/fade revision is not yet playback-tested.
+
+## Wider stereo drone
+
+Prepared build-midi-stereo.st extends build-midi-crossfade-clear.st. Inputs: Initializer, VCF, Oscillator, Level, DelayWithFeedback. No new templates. DroneWidth uses 0-1, initialized to 0.8; 0 centers the voices and 1 allows full left/right travel. Existing independent slow pan cycles remain. Each delay is fed through a second Level instance with reversed left/right gains, placing its input opposite the direct voice at that moment. DelayWithFeedback must retain its documented Stereo setting. This is not alternating ping-pong feedback. Combined direct L+R gain is preserved across width settings. Six-second output fade, note clearing, MIDI latch, and note crossfades remain. Outer patch-specific brightness controller is unchanged. Awaiting Kyma playback verification.
+
+## Named stereo drone inputs
+
+Prepared build-midi-stereo-named.st resolves exact case-sensitive names Initializer, VCF, Oscillator, Level, DelayWithFeedback using direct candidate name asString and select:. Requires exactly one match per role; otherwise reports the match count and aborts before scheduling. Order is arbitrary. All synthesis and control code after lookup is identical to build-midi-stereo.st. User will shuffle inputs to test. No new prototypes or controls. Outer brightness Script is not migrated by this change and retains its documented input ordering. Kyma compilation/playback pending.
+
+First named-input test failed: asString sent to Initializer (SoundWithVariables). Updated build-midi-stereo-named.st to candidate name printString instead; diagnostic printing previously displayed VCF. Awaiting retest.
+
+Confirmed by user: build-midi-stereo-named.st works great after replacing name asString with name printString. Exact-name lookup using inputs select: [:candidate | candidate name printString = requiredName], requiring one match, is now playback-verified in the stereo MIDI drone. Use this method for new patches so input ordering is irrelevant. Required role names remain case-sensitive. Missing/duplicate diagnostic branches have not been separately tested.
+
+User-confirmed working: the two-Script shared-support drone with restored brightness random walk. Parent KymaSystem has only drone in Inputs and supplies findInput. Child drone has Initializer, InitializerGated, VCF, Oscillator, Level, DelayWithFeedback in any order. Missing brightness controls were resolved by moving InitializerGated from parent Inputs into child Inputs; no code change was needed. Current child source: sounds/ambient-drone/build-midi-shared-child.st; parent: sounds/shared-support/parent.st. This confirms helper-driven template lookup during audio construction and the restored child brightness walk.
+
+## Slow delay modulation
+
+Updated shared child with a 30-second sinusoidal delay sweep of +/-0.1 seconds. Adds modulation after each slot's existing delay-time multiplier, so every slot gets the full depth; both crossfade banks share the same slot time. Actual delay clamps to 0.01-3 seconds to respect allocation; sweep clips at extreme DroneDelay settings. Existing Stereo/Linear/SmoothDelayChanges template settings apply. No new inputs or VCS controls; parent unchanged. Awaiting playback.
+
+User heard the 30-second +/-0.1-second delay LFO and found it too dramatic. Reduced amplitude to +/-0.02 seconds (20 ms), retaining period and all other behavior. Revised depth awaiting playback. This feedback confirms the original LFO was audible.
