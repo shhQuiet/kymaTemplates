@@ -6,12 +6,19 @@ Create native Kyma Sounds from descriptions using agent-authored Smalltalk and C
 
 [Full D Dorian sequence script](sounds/d-dorian-sequence/build-all-prototypes.st) is user-confirmed working with all four base prototypes: Oscillator, VCF, Level, and delay. It plays eight eighth notes, with a cutoff LFO spanning four repetitions and a tempo-synchronized feedback delay.
 
-Start with the [complete setup and VCS settings](sounds/d-dorian-sequence/README.md). Prototype recipes:
+Start with the [complete setup and VCS settings](sounds/d-dorian-sequence/README.md). See the [current template inventory](sounds/TEMPLATES.md) for exact user-confirmed names. Prototype recipes:
 
 - [Oscillator and Oscillator FM](sounds/oscillator-prototypes.md)
 - [VCF](sounds/vcf-prototype.md)
 - [Level](sounds/level-prototype.md)
 - [delay](sounds/delay-prototype.md)
+- [EUVerb](sounds/euverb-prototype.md) — setup prepared; not yet tested
+
+## New sound tests
+
+[Ambient drone](sounds/ambient-drone/README.md): sustained D-A-E voices with slow modulation and long echoes, using the same four prototypes. User-confirmed playback.
+
+[Dorian bass with Euverb Stereo](sounds/dorian-bass-euverb/README.md): slowly progressing bass notes and a first test of the stereo reverb template. Awaiting playback confirmation.
 
 ## Custom prototypes
 

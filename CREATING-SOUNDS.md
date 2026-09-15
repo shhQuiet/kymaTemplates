@@ -24,7 +24,7 @@ Use search-resolved asset filenames such as 'Saw0064.aif', not absolute paths in
 
 [build-all-prototypes.st](sounds/d-dorian-sequence/build-all-prototypes.st) is the latest user-confirmed baseline. Oscillator, VCF, stereo Level, and the wrapped delay all work with their expanded bindings. VCS tempo, cutoff offset, resonance, LFO depth, delay beats, feedback, and level have worked in this sequence.
 
-The delay remains inside a single-input Mixer wrapper. Direct insertion of DelayWithFeedback into Script Inputs was rejected; cause unresolved. Keep the working wrapper.
+The delay was tested inside a single-input Mixer wrapper. User later resolved direct insertion by renaming the Sound Delay: Script Inputs require Smalltalk-friendly names. A wrapper is optional. Use unique names without spaces or punctuation, such as OscillatorFM and EuverbStereo; positional references do not bypass this requirement.
 
 Oscillator FM, nonzero audio-rate VCF modulation, optional fixed-setting variants, live-tempo phase alignment, and native save/reopen are not established by those playback confirmations.
 

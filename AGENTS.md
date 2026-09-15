@@ -23,7 +23,7 @@ The user successfully ran this setup in Kyma:
 
 The user reported that it works. Treat this as the established baseline; do not restart the investigation into whether Script Sounds can work. Saving and reopening the resulting `.kym` have not been confirmed.
 
-Referencing `(inputs at: 1)` avoids requiring the user to rename the input Sound. A Sound's own name is not an Oscillator parameter named "Name"; do not repeat that confusing instruction.
+Referencing `(inputs at: 1)` avoids using the Sound name in source code, but does not bypass Script Inputs naming restrictions. A Sound's own name is not an Oscillator parameter named "Name"; do not repeat that confusing instruction.
 
 ## Construction model
 
@@ -110,13 +110,13 @@ The user clarified that the desired delivery is a custom prototype collection. P
 
 Kyma X Revealed printed 294-302 documents optional New Class from example. If using classes later, distinguish class fields from free variables bound by Script; arbitrary field setters remain unproven.
 
-The wrapped delay with VCS DelayBeats is user-confirmed. Retain the single-input Mixer wrapper named delay; direct DelayWithFeedback insertion rejection remains unexplained.
+The wrapped delay with VCS DelayBeats is user-confirmed. User subsequently established that direct insertion failed because of the Sound name: renaming it Delay allowed the drop. A Mixer wrapper is optional, not required for direct insertion. Existing working wrappers can remain.
 
 ## One-time prototype parameter coverage
 
 User explicitly prioritizes completing repetitive prototype setup once to avoid future human context switches. Expose all useful bindable fields upfront, supply complete parameter values in agent-authored scripts, and use separate variants for fixed menus/checkboxes or structural choices. Do not defer ordinary fields such as Oscillator Formant merely for simplicity. Custom prototype collection can contain prepared Sounds; encapsulated custom classes are optional. Oscillator setup is in sounds/oscillator-prototypes.md; base prototype playback is confirmed.
 
-Prototype naming and hardware: user has current Kyma hardware and explicitly requests excluding legacy parameters. Do not expose Oscillator PitchBend or supply pitchBend: in new template calls. Use Oscillator and Oscillator FM as prototype names; AI belongs only in the collection name, not each object name.
+Prototype naming and hardware: user has current Kyma hardware and explicitly requests excluding legacy parameters. Do not expose Oscillator PitchBend or supply pitchBend: in new template calls. Use Script-compatible names such as Oscillator and OscillatorFM; AI belongs only in the collection name, not each object name.
 
 User confirmed the expanded Oscillator prototype plays correctly in the existing sequencer. build-vcs-delay.st now includes that full oscillator call. Fully parameterized VCF setup is sounds/vcf-prototype.md; playback is confirmed.
 
@@ -129,3 +129,35 @@ User confirmed build-vcs-delay-prototypes.st works with both the expanded Oscill
 Level prototype with separate ?left and ?right was user-confirmed working; build-vcs-delay-prototypes.st now reflects that successful script. Full numeric Delay prototype setup is sounds/delay-prototype.md; sounds/d-dorian-sequence/build-all-prototypes.st is user-confirmed working.
 
 Latest confirmed baseline: sounds/d-dorian-sequence/build-all-prototypes.st. User reported "works good" after testing the fully parameterized base delay wrapper. Oscillator, VCF, stereo Level, and base delay are all confirmed in this script, ordered VCF, Oscillator, Level, delay. Oscillator FM and optional fixed-setting variants remain unverified. Use this full script as the starting point for future sound revisions.
+
+Ambient drone: sounds/ambient-drone/build.st is user-confirmed ("very nice"). It reuses the same four base prototypes for three sustained D-A-E voices with distinct slow modulation, stereo balance, and delay times. This validates the three-iteration construction loop in this sound. Drone-prefixed controls are independent of the sequencer. Native save/reopen and individual control tests are not separately confirmed.
+
+## Default VCS ranges: normalized controls
+
+User requests 0-1 VCS controls wherever possible to avoid manual range editing. Map normalized values to physical quantities inside the script, clamp controls before scaling, and give normalized starting values. Use 0-1 for relative controls. User explicitly allows natural units for time and frequency (and similar meaningful physical quantities); retain Hz/seconds where appropriate. DroneMotion remains a normalized relative slowness macro, while DroneBrightness/DroneDepth remain Hz and DroneDelay remains seconds. For existing Sounds, saved widget ranges and preset values may require a one-time migration; script arithmetic does not reset VCS metadata. A deliberate exception, such as previously requested literal !BPM, should follow user intent rather than silently changing its meaning. Current ambient-drone/build.st is normalized and awaiting playback; original confirmed source is build-physical-controls.st. Always provide the full updated script inline.
+
+EUVerb prototype preparation is documented in sounds/euverb-prototype.md (Sound Class Reference 64-66). Not yet playback-tested. Its cutoff fields and decay are normalized controls, not literal Hz/seconds. Freeze is documented as a button; parameter binding remains unestablished.
+
+EUVerb correction: user selected the composite Euverb Stereo, whose EuverbLeft and EuverbRight fields differ from the generic EUVerb class. Screenshot-confirmed recipe is sounds/euverb-prototype.md: left has decay/cutoff/reverb; right also has diffusion. Outer Variable source, dry Level both channels ?direct; preserve channel routing. Generic EUVerb ranges must not be assumed for this composite. Not yet playback-tested.
+
+Generic VCS initialization is now user-confirmed: sounds/ambient-drone/build-startup-test.st uses Initialize (TriggeredSoundToGlobalController) at input 5, GeneratedEvent ?event, Value ?value, Trigger 1, Gated off, Silent/AllowLiveOverride/ShowInVCS on. Script supplies event: !DroneLevel and value: 0.5. User reported "works" for the requested startup/live-adjustment/replay test. Use this mechanism for scripted starting settings; multi-target and physical-range initialization are not yet tested. Value follows target VCS range scaling; see sounds/vcs-initialization.md.
+
+Initializer scaling correction: user observed DroneDepth 0.16667 when supplying 500/3000. In this actual setup, that value passes through rather than mapping to 500. Do not repeat the assumed inverse-range conversion. Current ambient-drone/build-initialized.st sends physical values directly: DroneDepth 500, DroneBrightness 180, DroneDelay 1.8. Verify displayed values after playback; actual widget metadata has not been inspected. This supersedes earlier conversion guidance for this test.
+
+Confirmed result: user reported "yep, that worked" after the direct-value revision of ambient-drone/build-initialized.st. This is now the confirmed all-control initializer baseline in the user's setup: physical values sent directly (DroneBrightness 180, DroneDepth 500, DroneDelay 1.8), relative values sent in 0-1. Do not apply the earlier inverse-range conversion here. Broader behavior under different widget configurations remains untested.
+
+MIDI setup diagnosis confirmed: ordinary keyboard note events arrived on channel 1 in the monitor, but neither factory keyboard Sounds nor the direct !KeyNumber oscillator test responded while MIDI Configuration was Manual / Generic MPE. User confirmed disabling MPE fixed the issue. For this conventional channel-1 keyboard use MPE disabled; do not infer working Sound note routing merely from monitor traffic. The three-note MIDI latch still needs a separate post-fix playback confirmation.
+
+## Script Inputs require compatible Sound names
+
+User confirmed that Script input objects must have Smalltalk-friendly names. Renaming the delay to Delay fixed its rejected drop. Use unique simple names with no spaces or punctuation, e.g. VCF, Oscillator, OscillatorFM, Level, Delay, EuverbStereo, Initialize. User verified uppercase Delay works; do not impose a lowercase-only rule from older manuals. Positional inputs at: references do not bypass editor naming restrictions. Check name first when a Sound cannot be dropped/pasted into Script Inputs, before inventing class restrictions or adding wrappers. This corrects earlier advice recommending names containing spaces.
+
+Current input-order preference: Initialize must be first. For the MIDI crossfade drone with output toggle, use Initialize, VCF, Oscillator, Level, Delay (indices 1-5). sounds/ambient-drone/build-midi-crossfade-toggle.st has been updated accordingly. Apply initializer-first ordering to future scripts. Historical scripts retain their documented earlier order; do not confuse them with the current script.
+
+Nested Script test prepared: sounds/brightness-walk-wrapper/ wraps the existing drone unchanged with Initialize, Drone, Control inputs. Control is a generic SoundToGlobalController writing !DroneBrightness continuously. Low/high controls govern base brightness, not added DroneDepth modulation. Documented but not yet playback-verified.
+
+Explicitly announce any new template requirement before using it in code, and prefer a suitable independent copy of existing templates. Brightness-walk wrapper Control now uses a copy of Initialize with Gated checked (Trigger 1). In Smalltalk, parenthesize successive keyword operations: (x vmax: low) vmin: high; x vmax: low vmin: high sends nonexistent vmax:vmin: and caused a confirmed compilation error.
+
+Authoritative current user template names are in sounds/TEMPLATES.md, transcribed from screenshot. Use Initializer (not Initialize), DelayWithFeedback (not Delay), and EuverbStereo. Only one controller template exists: Initializer. Do not assume a Control template was created. Previous recipe used TriggeredSoundToGlobalController; latest inventory screenshot does not independently show exact class or Gated setting. Explain any need for an independent gated copy before code relies on it.
+
+Architecture clarification from user: the inner drone Script and outer brightness-control Script are patch-specific compositions, not reusable library building blocks. Reusable objects are the prepared templates (Oscillator, VCF, Level, delay variants, EuverbStereo, Initializer, and proposed GatedInitializer). Nested Scripts organize a particular patch; do not promote their implementation to a reusable template unless requested. GatedInitializer is user-proposed, not yet confirmed created.

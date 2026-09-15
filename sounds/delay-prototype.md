@@ -1,3 +1,5 @@
+> Naming correction: user confirmed renaming the delay to **Delay** allows direct insertion into Script Inputs. The Mixer wrapper used during initial testing is optional. Keep the same exposed bindings when using the direct Sound. Use identifier-style names such as DelayAllpass for variants.
+
 # Delay prototype
 
 Retain the proven single-input Mixer wrapper, named delay, with Left and Right 1. Inside DelayWithFeedback: Input Variable named source; Delay ?maxDelay; DelayScale ?delayFraction; Feedback ?feedback; Scale ?scale; SlewRate ?slewRate. maxDelay must be supplied at compile time; live timing is delayFraction * maxDelay. Verified baseline supplies maxDelay 3 s, scale 1, slewRate 1.

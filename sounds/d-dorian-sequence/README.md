@@ -13,7 +13,7 @@ Keep these four separate entries in this exact order:
 | 3 | Level | [Setup](../level-prototype.md) |
 | 4 | delay | [Setup](../delay-prototype.md) |
 
-Keep Script Left and Right at 1. The delay entry is the working single-input Mixer wrapper, not the bare DelayWithFeedback. Templates are available in the AI collection in `/Volumes/Kyma/SH-Kyma/Classes/Custom Collections.kym`.
+Keep Script Left and Right at 1. The verified delay entry used a single-input Mixer wrapper; direct DelayWithFeedback insertion is also possible when named Delay. Keep the same exposed variables. Templates are available in the AI collection in `/Volumes/Kyma/SH-Kyma/Classes/Custom Collections.kym`.
 
 ## VCS settings
 
