@@ -1,4 +1,4 @@
-# Creating native Kyma Sounds for Steve Horne
+# Creating native Kyma Sounds
 
 ## Start here
 
