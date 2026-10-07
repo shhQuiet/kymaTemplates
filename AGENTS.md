@@ -2,14 +2,18 @@
 
 ## Start here
 
-Read CURRENT.md before starting a new sound, then sounds/shared-support/README.md and sounds/TEMPLATES.md. The user has finished the drone and intends to create a different sound in a new chat. Preserve the finished drone; create a new sound folder for the next patch. This repository is /Users/stevehorne/dev/kyma; GitHub origin is https://github.com/shhQuiet/kymaTemplates.git. Do not imply local edits are pushed unless a push is actually performed.
+Read CURRENT.md before starting a new sound, then sounds/shared-support/README.md and sounds/TEMPLATES.md. This repository is /Users/stevehorne/dev/kyma; GitHub origin is https://github.com/shhQuiet/kymaTemplates.git. Preserve existing patches and create a new sound folder for each new request. Do not imply local edits are pushed unless a push is actually performed.
+
+**Each new sound is musically independent.** Derive its notes, rhythm, timbre, modulation, probability rules, and controls only from the current user's description. Do not inspect or borrow musical behavior from previous patches, even if a prior patch uses the same scale, instrument, or effect. Earlier `.st` files are evidence for template binding and Script mechanics only; consult them solely when a technical interface cannot be resolved from shared support, template recipes, or installed documentation. Never infer an unrequested random walk, drone behavior, delay, or other musical feature from an old sound.
 
 ## Objective and workflow
 
 Turn the user's description into playable native Kyma Sounds. The user builds minimal wrappers through Kyma's UI; the agent writes Smalltalk graph construction and Capytalk live behavior. Use the existing custom prototypes and the proven common-parent/patch-child arrangement. No public graph-creation API is established or needed. A Sound template is copied into each constructed instance; shared functions do not require shared mutable references.
 
+For a new sound request, the expected deliverable is **instructions for Steve about which reusable prototypes to drop into which Script, followed by a complete patch-specific Script he can paste**. The parent Script already contains helper functions; read and reuse it rather than rebuilding its lookup logic in the child. Treat sound descriptions as musical requirements for this deliverable. Do not begin by inspecting the live Kyma app, looking for an unrelated workspace, or trying to edit a binary `.kym` Sound. If Steve explicitly asks for an understanding-only response while describing a sound, wait; when he asks to start work, write the setup and script.
+
 - Parent Script defines reusable helper blocks and schedules the child, passing helpers as template bindings. Child Script contains patch-specific musical code and its own template Inputs. Audio passes through the parent.
-- Current generic parent example: sounds/shared-support/parent.st. Current child: sounds/ambient-drone/build-midi-shared-child.st.
+- Generic parent source: sounds/shared-support/parent.st. Read it for helper bindings. Patch-specific children are separate musical works, not starting points for new sound design.
 - Exactly two Scripts in the current drone: child drone -> parent KymaSystem -> existing MIDI voice/wrapper. There is NO separate brightness Script. Brightness walk belongs to the child.
 - Reuse stable helpers. Do not put patch-specific musical behavior into the generic support layer by default. For a new patch, specify the child name for clarity; the latest generic parent iterates all input Scripts without name lookup. Each receives findInput and starts at zero; outputs mix. Parent inputs must be patch Scripts accepting findInput, not raw templates. This all-input iteration revision awaits playback.
 - Kyma Script requires at least one input. The minimal block-passing test used an unused Oscillator in the child.
@@ -24,6 +28,7 @@ Turn the user's description into playable native Kyma Sounds. The user builds mi
 - AI is the collection/category name, not an object-name prefix.
 - User performs minimal UI setup and playback. Do not use UI automation as the main authoring mechanism. Ask for exact errors/results when needed, not repeated broad setup checks.
 - Distinguish verified playback, documented behavior, and proposed experiments. Never claim to have heard/compiled/saved/reopened a Kyma Sound without evidence.
+- For each new child, create a patch folder with the complete `.st` source and setup notes. Give the complete changed Script inline in the response, even when it is also saved in a file. Link the unchanged parent source when useful; no parent edit is needed merely to add a child.
 
 ## Verified lookup and shared functions
 
@@ -49,9 +54,10 @@ Initializer start: 0 s event: !DroneDepth value: 500 sets 500 in the user's setu
 
 ## Current evidence and limitations
 
-- Four base prototypes and D Dorian sequencer verified: sounds/d-dorian-sequence/build-all-prototypes.st (historical positional inputs).
+- Four base prototypes verified in a historical D Dorian sequencer: sounds/d-dorian-sequence/build-all-prototypes.st (positional inputs). This is interface evidence only for new patches.
 - Named stereo MIDI drone verified: sounds/ambient-drone/build-midi-stereo-named.st.
 - Shared-parent drone and restored child brightness walk verified after placing InitializerGated in the child.
+- A Dorian sparkles has a proposed child Script and setup instructions in sounds/a-dorian-sparkles/. Its discrete adjacent-note Markov chain and filtered timbre have not yet been compiled or auditioned in Kyma.
 - Latest shared child adds a requested 30-second +/-0.02-second delay LFO. The original +/-0.1-second sweep was audible but too dramatic; reduced depth awaits explicit playback confirmation. Preserve it as latest delivered source and label accurately.
 - EuverbStereo prepared; playback not explicitly confirmed. OscillatorFM and optional delay variants are inventory-confirmed, not separately playback-verified.
 - Current MIDI keyboard: channel 1, MPE DISABLED. Generic MPE prevented response even though note messages arrived in monitor. Existing MIDIVoice Live MIDI, channel1, polyphony1 wraps whole three-slot drone. Polyphony3 would duplicate the entire script. No need to repeat this troubleshooting for a new patch unless symptoms justify it.
@@ -68,3 +74,5 @@ Initializer start: 0 s event: !DroneDepth value: 500 sets 500 in the user's setu
 Native .kym files are binary BOSS objects. Readable strings are useful references, not a safe editable representation. Do not fabricate or patch native graphs or copy whole proprietary/personal asset libraries. User saves native Sounds through Kyma. Store authored .st and setup/evidence in this repo. Native file location/save-reopen for the finished drone is not recorded. Do not invent it.
 
 User-approved standard parent behavior: treat every parent input as a child patch Script, pass the common helper bindings to each, schedule all at start: 0 s, and mix their audio outputs. No hard-coded child name or special single-child path. Keep raw prototypes inside the children. This is the intended architecture; the latest all-child iteration implementation is still awaiting explicit playback confirmation.
+
+Latest delay adjustment: user requested still less wobble. Current child uses a 30-second sinusoidal delay LFO with +/-0.005 seconds (5 ms) depth, reduced from20ms. All other sound behavior remains unchanged; this depth awaits playback confirmation.

@@ -30,3 +30,5 @@ Brightness walk steps once per second, folds signed random walk with abs, smooth
 Latest change: common 30-second sinusoid adds +/-0.02 seconds AFTER slot offsets (2/3,5/6,1 times DroneDelay), giving all slots the full modulation. Times clamp0.01-3s. Existing delay Stereo/Linear/SmoothDelayChanges settings retained; no new controls.
 
 Shared lookup, stereo drone, and restored child brightness walk were explicitly confirmed working. User heard the original +/-0.1-second delay LFO and requested less depth. The reduced +/-0.02-second version awaits explicit playback confirmation. Native file path and save/reopen not recorded. Do not claim this source alone is a native .kym.
+
+Latest delay adjustment: user requested still less wobble. Current child uses a 30-second sinusoidal delay LFO with +/-0.005 seconds (5 ms) depth, reduced from20ms. All other sound behavior remains unchanged; this depth awaits playback confirmation.

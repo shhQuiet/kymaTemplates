@@ -1,6 +1,10 @@
-# Handoff: ready for a new sound
+# Handoff: reusable Script workflow
 
-Updated 2026-09-15. Steve is finished with the MIDI ambient drone and wants to create another sound in a new chat. Use this repository and preserve the drone. Start a new sound folder when the new musical request arrives; do not keep refining the drone unless asked.
+Updated 2026-09-15. Steve's ongoing task for Codex is to turn a described sound into (1) exact instructions for dragging existing reusable prototypes into a child Script and (2) a complete copy-and-paste Smalltalk/Capytalk child Script. The parent Script supplies shared helpers. Read [AGENTS.md](AGENTS.md), [shared support](sounds/shared-support/README.md), and the [template inventory](sounds/TEMPLATES.md) before authoring. Preserve existing patches; start a new folder for each new sound.
+
+New sounds have no musical relationship to old sounds. Use the current request as the sole source of musical behavior. Read the shared parent and prototype interfaces for construction mechanics; do not look through earlier sound scripts for ideas or copy their notes, rhythms, modulation, probability rules, effects, or controls. This separation is Steve's explicit correction after a random walk from an earlier patch influenced the first A Dorian proposal.
+
+The newest request is [A Dorian sparkles](sounds/a-dorian-sparkles/README.md): eighth notes starting at A4, discrete Markov selection that stays or moves to an adjacent A Dorian scale note, a tinkly sine-plus-filtered-saw timbre, and a light delay. The [child Script](sounds/a-dorian-sparkles/build-shared-child.st) and exact input setup were written, but Steve has not yet reported a Kyma compile or playback result. Treat it as proposed, not verified. If he supplies errors or an audition result, revise the complete child Script and update its evidence notes.
 
 ## Proven architecture
 
@@ -36,3 +40,5 @@ Existing conventional MIDI setup is channel1, MPE off, single outer MIDIVoice wi
 User-approved standard parent behavior: treat every parent input as a child patch Script, pass the common helper bindings to each, schedule all at start: 0 s, and mix their audio outputs. No hard-coded child name or special single-child path. Keep raw prototypes inside the children. This is the intended architecture; the latest all-child iteration implementation is still awaiting explicit playback confirmation.
 
 Latest follow-up: user found the initial delay LFO too dramatic, confirming it was audible. Current child reduces its depth to +/-0.02 seconds (20 ms), retaining the 30-second period. Reduced-depth revision awaits playback.
+
+Latest delay adjustment: user requested still less wobble. Current child uses a 30-second sinusoidal delay LFO with +/-0.005 seconds (5 ms) depth, reduced from20ms. All other sound behavior remains unchanged; this depth awaits playback confirmation.

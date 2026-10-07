@@ -24,3 +24,5 @@ Current child includes the reduced +/-0.02-second delay LFO; user found the orig
 User-approved standard parent behavior: treat every parent input as a child patch Script, pass the common helper bindings to each, schedule all at start: 0 s, and mix their audio outputs. No hard-coded child name or special single-child path. Keep raw prototypes inside the children. This is the intended architecture; the latest all-child iteration implementation is still awaiting explicit playback confirmation.
 
 The local child variable findInput is a convenient alias for ?findInput, which receives the supplied block. Passing a block does not install a method: self findInput is not an established substitute.
+
+Latest delay adjustment: user requested still less wobble. Current child uses a 30-second sinusoidal delay LFO with +/-0.005 seconds (5 ms) depth, reduced from20ms. All other sound behavior remains unchanged; this depth awaits playback confirmation.

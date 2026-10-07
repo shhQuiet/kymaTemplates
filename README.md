@@ -6,6 +6,8 @@ Create native Kyma Sounds from descriptions using agent-authored Smalltalk and C
 
 Read [CURRENT.md](CURRENT.md) and [AGENTS.md](AGENTS.md). The finished MIDI drone establishes the current shared-parent/patch-child workflow with order-independent named template lookup. Reuse [shared support](sounds/shared-support/README.md) for new patches. The current drone source and controls are in [its README](sounds/ambient-drone/README.md).
 
+Steve describes the sound; Codex tells him exactly which reusable prototypes to drop into the child Script and writes the complete Script for pasting. The parent supplies reusable helpers. The latest proposed example is [A Dorian sparkles](sounds/a-dorian-sparkles/README.md); it awaits Kyma playback confirmation.
+
 ## Earlier working baseline
 
 [Full D Dorian sequence script](sounds/d-dorian-sequence/build-all-prototypes.st) is user-confirmed working with all four base prototypes: Oscillator, VCF, Level, and delay. It plays eight eighth notes, with a cutoff LFO spanning four repetitions and a tempo-synchronized feedback delay.

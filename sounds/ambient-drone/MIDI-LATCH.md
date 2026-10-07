@@ -65,3 +65,5 @@ User-confirmed working: the two-Script shared-support drone with restored bright
 Updated shared child with a 30-second sinusoidal delay sweep of +/-0.1 seconds. Adds modulation after each slot's existing delay-time multiplier, so every slot gets the full depth; both crossfade banks share the same slot time. Actual delay clamps to 0.01-3 seconds to respect allocation; sweep clips at extreme DroneDelay settings. Existing Stereo/Linear/SmoothDelayChanges template settings apply. No new inputs or VCS controls; parent unchanged. Awaiting playback.
 
 User heard the 30-second +/-0.1-second delay LFO and found it too dramatic. Reduced amplitude to +/-0.02 seconds (20 ms), retaining period and all other behavior. Revised depth awaiting playback. This feedback confirms the original LFO was audible.
+
+Further delay-depth reduction requested: latest child now uses +/-5ms over30s, one quarter of the previous20ms sweep. No parent, input, or VCS changes. Awaiting playback. Separate Multigrid ?Decay prompt remains unresolved and has not been attributed to the drone.
